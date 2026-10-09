@@ -1,10 +1,8 @@
-# FitLip web experience
+# FitLip web
 
-Next.js 15.5.27 / React 19 / TypeScript / Tailwind 4 / React Three Fiber / drei / GSAP ScrollTrigger / Framer Motion. Built for Vercel.
+Next.js 15.5.27 / React 19 / TypeScript / Tailwind 4 / React Three Fiber / drei / Framer Motion. Built for Vercel.
 
 Live website: https://fitlip.vercel.app
-
-Vercel project: https://vercel.com/amansamanis-projects/fitlip
 
 ## Local use
 
@@ -13,34 +11,51 @@ npm ci
 npm run dev
 ```
 
-Open http://localhost:3000. Production: `npm run build` then `npm start`. Development uses `.next-dev`, production uses `.next`, so their output cannot collide.
+Open http://localhost:3000. Production: `npm run build` then `npm start`. `npm run build` runs the APK checksum gate first, so it needs the real APK in `public/downloads/` or `APK_DOWNLOAD_URL` set. For a quick UI-only build, run `npx next build`.
+
+## Page structure
+
+1. **Hero**: headline in the display face, two actions.
+2. **Phone tour**: a pinned 3D phone shows seven real app screens (Home, Diet, Coach, Camera, Exercise, Track, Run). The phone starts on the left with the text on the right. As you scroll it descends, then swoops down and across to the other side while the text moves to the left, and so on. A dock and counter show where you are.
+3. **Download**: APK button, QR code (laptops and desktops only), SHA-256 with copy, in-browser file check, terminal commands, signing certificate, install steps.
 
 ## Directory map
 
 ```text
 src/
   app/
-    layout.tsx                  Self-hosted fonts, metadata and theme
-    page.tsx                    Landing route
-    globals.css                 Responsive visual system
+    layout.tsx                  Self-hosted fonts (Inter, Instrument Serif), metadata, viewport
+    page.tsx                    Landing route (server component)
+    globals.css                 Tailwind 4 theme tokens, hero entrance, reduced motion
+    icon.svg                    Favicon (FL mark)
     api/download/route.ts       Same-origin download redirect
     api/release/route.ts        Public release metadata
   components/
-    fitlip-experience.tsx       Landing page, gallery, FAQ and sticky CTA
-    download/
-      download-provider.tsx     Modal, install stepper, QR, local SHA-256 verification
-    scene/
-      scene-loader.tsx          Lazy Canvas, capability detection and CSS fallback
-      phone-scene.tsx           Phone layers, materials, particles and selective bloom
-  hooks/use-scroll-scene.ts     GSAP disassembly timeline and metric badge sequence
-  lib/release.ts                Actual release metadata and screenshot catalogue
+    brand/fitlip-mark.tsx       FL mark, copied from the app
+    landing/
+      preloader.tsx             Short logo screen that lifts away
+      nav.tsx                   Top bar
+      hero.tsx                  Hero
+      phone-tour.tsx            Scroll section: progress, text, dock, counter, WebGL guard
+      phone-canvas.tsx          R3F phone: metal body, screen textures, procedural lighting
+      download-section.tsx      Download, QR, hash check, install steps
+  lib/
+    release.ts                  Release metadata (version, size, SHA-256, signing cert, site URL)
+    tour.ts                     Screen list, copy, and the scroll path of the phone
 public/
-  screens/                     Optimized actual app screenshots
+  screens/                      Real app screenshots (WebP)
   downloads/fitlip-2.0.0.apk    Local release copy (excluded from Vercel upload)
 scripts/
-  verify-release.mjs           Build gate: compare size and SHA-256
-  prepare-screens.mjs          WebP conversion from supplied originals
+  verify-release.mjs            Build gate: compare size and SHA-256
+  prepare-screens.mjs           WebP conversion from supplied originals
 ```
+
+## Editing the page
+
+- **Screen copy and order**: `STEPS` in `src/lib/tour.ts`. Add a screenshot to `public/screens/` and a new entry; the tour length, counter and dock follow automatically.
+- **How the phone moves**: `pose()` in `src/lib/tour.ts`. Side, descent, swoop and the point where the screen swaps are all there.
+- **Colors and fonts**: `@theme` in `src/app/globals.css`.
+- **Download URL and QR**: the button points to `/api/download`. The QR encodes `NEXT_PUBLIC_SITE_URL` (default `https://fitlip.vercel.app`) plus `/api/download`. Set the variable if you move to a custom domain.
 
 ## APK release
 
@@ -64,17 +79,13 @@ Build verification streams and checks the external APK if the bundled file is ab
 
 ## Motion and resilience
 
-- Lazy-loaded R3F renderer; zero external model or environment-map fetches.
-- Procedural rounded-box phone geometry; no GLB asset requiring Draco or Meshopt decoding.
-- Particle field uses one points draw call. Pointer velocity modulates drift.
-- Pixel ratio capped below 2; performance decline reduces it to 1 and disables bloom.
-- Canvas stops rendering when off-screen or the document is hidden.
-- Reduced motion, data saver, low device capability, WebGL creation errors and context loss use the reserved CSS phone fallback. CSS fallback remains visible during scene loading.
-- Mobile uses a compact scroll layout. The full exploded phone sequence is desktop-only.
-- Optional gyroscope tilt asks for permission on platforms that require it.
-- Bloom is restrained. Depth of field and chromatic aberration are intentionally omitted to preserve app-screen readability and mobile performance.
-- Native dialog provides modal focus trapping and Escape handling. The opener regains focus after closing. Preview switches are keyboard accessible.
-- QR encodes the current origin installation page; mobile scanning only works after deployment or when served from an address reachable by the phone.
+- The 3D phone loads only in the browser (`next/dynamic`, `ssr: false`) and renders only while the tour is on screen.
+- Lighting is procedural (drei `Lightformer`), so no HDR file is fetched. The phone body is a rounded box, so no GLB is needed.
+- Pixel ratio is capped at 2.
+- If WebGL is unavailable, the tour shows the current screen as a flat image.
+- Reduced motion turns off the swoop, tilt and pointer parallax, the hero entrance and the preloader delay.
+- Below 54rem the tour stacks: phone on top, text underneath, and the dock collapses to dots.
+- QR code: encodes the download URL on `NEXT_PUBLIC_SITE_URL`; mobile scanning works once the site is deployed.
 
 ## Security and maintenance
 

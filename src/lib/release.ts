@@ -18,3 +18,8 @@ export const screens = [
   { id: 'workouts', label: 'Training', src: '/screens/workouts.webp', alt: 'FitLip weekly workout plan with equipment options' },
   { id: 'tracking', label: 'Activity', src: '/screens/tracking.webp', alt: 'FitLip daily activity tracking with steps, active calories and sleep' },
 ] as const;
+
+/** Public origin used to build the QR code. Set NEXT_PUBLIC_SITE_URL when you use a custom domain. */
+export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://fitlip.vercel.app';
+/** SHA-256 of the Android signing certificate, verified with apksigner (see README). */
+export const signingCertSha256 = 'f79fcd8937facb5457a6578f8505dc047c51ef8a4fdd41fa6cac3be8120afa1c';
