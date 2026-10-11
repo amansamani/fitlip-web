@@ -9,7 +9,7 @@ export const developer = {
   links: [
     { id: 'github', label: 'GitHub', href: 'https://github.com/amansamani', display: 'github.com/amansamani' },
     { id: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/in/aman-samani', display: 'linkedin.com/in/aman-samani' },
-    { id: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/aman.script', display: '@amansamani' },
+    { id: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/aman.script', display: '@aman.script' },
     { id: 'email', label: 'Gmail', href: 'mailto:amanworkinfo@gmail.com', display: 'amanworkinfo@gmail.com' },
   ],
 } as const;
