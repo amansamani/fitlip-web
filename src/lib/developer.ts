@@ -7,7 +7,7 @@ export const developer = {
   role: 'Full-stack & AI developer',
   blurb: 'I build FitLip and this website. For feedback, bug reports or work enquiries, reach out on any of these.',
   links: [
-    { id: 'github', label: 'GitHub', href: 'https://github.com/amansamano', display: 'github.com/amansamani' },
+    { id: 'github', label: 'GitHub', href: 'https://github.com/amansamani', display: 'github.com/amansamani' },
     { id: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/in/aman-samani', display: 'linkedin.com/in/aman-samani' },
     { id: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/aman.script', display: '@amansamani' },
     { id: 'email', label: 'Gmail', href: 'mailto:amanworkinfo@gmail.com', display: 'amanworkinfo@gmail.com' },
