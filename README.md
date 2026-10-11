@@ -15,47 +15,33 @@ Open http://localhost:3000. Production: `npm run build` then `npm start`. `npm r
 
 ## Page structure
 
-1. **Hero**: headline in the display face, two actions.
-2. **Phone tour**: a pinned 3D phone shows seven real app screens (Home, Diet, Coach, Camera, Exercise, Track, Run). The phone starts on the left with the text on the right. As you scroll it descends, then swoops down and across to the other side while the text moves to the left, and so on. A dock and counter show where you are.
-3. **Download**: APK button, QR code (laptops and desktops only), SHA-256 with copy, in-browser file check, terminal commands, signing certificate, install steps.
+The opening is a continuous, scroll-controlled 3D product story, followed by everyday feature cards, Android download, QR dialog, installation FAQ, and file-integrity controls.
 
-## Directory map
+The eight story chapters are: introduction → daily overview → meal capture → nutrition → training → outdoor activity → daily tracking → AI coach. One Three.js phone moves between sides, tilts, moves through depth, and crossfades real app screenshots. Procedural scene objects add context: a plate, macro rings, a dumbbell, an outdoor route, activity rings, and a coaching chart. The opening adapts the native splash's bouncing F, purple bloom, and Exercise / Diet / Track icons, without orbit rings or looping movement. Normal scrolling works in both directions on desktop and mobile. Chapter buttons jump to exact scene landings; Skip tour leads directly to the supporting sections.
 
-```text
-src/
-  app/
-    layout.tsx                  Self-hosted fonts (Inter, Instrument Serif), metadata, viewport
-    page.tsx                    Landing route (server component)
-    globals.css                 Tailwind 4 theme tokens, hero entrance, reduced motion
-    icon.svg                    Favicon (FL mark)
-    api/download/route.ts       Same-origin download redirect
-    api/release/route.ts        Public release metadata
-  components/
-    brand/fitlip-mark.tsx       FL mark, copied from the app
-    landing/
-      preloader.tsx             Short logo screen that lifts away
-      nav.tsx                   Top bar
-      hero.tsx                  Hero
-      phone-tour.tsx            Scroll section: progress, text, dock, counter, WebGL guard
-      phone-canvas.tsx          R3F phone: metal body, screen textures, procedural lighting
-      download-section.tsx      Download, QR, hash check, install steps
-  lib/
-    release.ts                  Release metadata (version, size, SHA-256, signing cert, site URL)
-    tour.ts                     Screen list, copy, and the scroll path of the phone
-public/
-  screens/                      Real app screenshots (WebP)
-  downloads/fitlip-2.0.0.apk    Local release copy (excluded from Vercel upload)
-scripts/
-  verify-release.mjs            Build gate: compare size and SHA-256
-  prepare-screens.mjs           WebP conversion from supplied originals
-```
+The header and footer use the exact custom vector wordmark from the mobile app's `src/components/share/FitLipWordmark.tsx`, including the sweeping F and original letter/dot outlines. This is not an approximated font.
 
-## Editing the page
+## Main implementation files
 
-- **Screen copy and order**: `STEPS` in `src/lib/tour.ts`. Add a screenshot to `public/screens/` and a new entry; the tour length, counter and dock follow automatically.
-- **How the phone moves**: `pose()` in `src/lib/tour.ts`. Side, descent, swoop and the point where the screen swaps are all there.
-- **Colors and fonts**: `@theme` in `src/app/globals.css`.
-- **Download URL and QR**: the button points to `/api/download`. The QR encodes `NEXT_PUBLIC_SITE_URL` (default `https://fitlip.vercel.app`) plus `/api/download`. Set the variable if you move to a custom domain.
+- `src/components/landing/scroll-story.tsx`: scroll progress, chapter copy, direct navigation, reading mode, WebGL boundary, and visibility handling.
+- `src/components/landing/splash-elements.tsx`: native splash identity and finite entrance animation.
+- `src/components/landing/story-canvas.tsx`: real 3D phone, screen crossfades, smooth camera-relative motion, and procedural scene objects.
+- `src/lib/story.ts`: chapter narrative, screenshots, chapter interpolation, and choreography keyframes.
+- `src/components/brand/fitlip-wordmark.tsx`: authentic mobile wordmark geometry.
+- `src/components/landing/landing-page.tsx`: navigation, supporting features, download, QR, and FAQs.
+- `src/app/story.css`: narrative layout and responsive behavior.
+- `src/app/landing.css`: base design system and supporting sections; older three-chapter rules are retained but no longer used.
+- `src/lib/seo.ts`: canonical origin, metadata copy, and WebSite/MobileApplication JSON-LD.
+- `src/app/layout.tsx`: title, description, canonical, Open Graph, Twitter, robots metadata, and fonts.
+- `src/app/robots.ts`, `src/app/sitemap.ts`: crawler rules and canonical sitemap.
+- `public/opengraph-image.png`: custom 1200 × 630 share image using the real wordmark and app screen.
+- `src/app/apple-icon.png`: 180 × 180 icon derived from the existing app mark.
+
+## Editing and SEO
+
+Edit the story content and timing in `src/lib/story.ts`. The animation maps scroll progress to the same chapter data, including the fallback screenshots. Set `NEXT_PUBLIC_SITE_URL` to the intended production origin for canonical URLs, the sitemap, structured data, and QR download. Default: `https://fitlip.vercel.app`.
+
+All eight chapter narratives are present in the server-rendered HTML. The 3D scene loads separately on the client. Metadata describes the actual Android app; structured data does not invent reviews, ratings, pricing, or publisher claims. The sitemap includes the landing page; crawler rules exclude API routes and APK files. Search Console submission and public indexing checks require a future deployment and were not performed.
 
 ## APK release
 
@@ -79,13 +65,13 @@ Build verification streams and checks the external APK if the bundled file is ab
 
 ## Motion and resilience
 
-- The 3D phone loads only in the browser (`next/dynamic`, `ssr: false`) and renders only while the tour is on screen.
-- Lighting is procedural (drei `Lightformer`), so no HDR file is fetched. The phone body is a rounded box, so no GLB is needed.
-- Pixel ratio is capped at 2.
-- If WebGL is unavailable, the tour shows the current screen as a flat image.
-- Reduced motion turns off the swoop, tilt and pointer parallax, the hero entrance and the preloader delay.
-- Below 54rem the tour stacks: phone on top, text underneath, and the dock collapses to dots.
-- QR code: encodes the download URL on `NEXT_PUBLIC_SITE_URL`; mobile scanning works once the site is deployed.
+- The 3D scene is dynamically imported and guarded by an error boundary and context-loss handler. Its real screenshot fallback remains until the first rendered frame.
+- Save-data preferences, low reported memory, or unavailable WebGL use the screenshot presentation.
+- Rendering runs on demand during scroll and interpolation, then pauses when settled, outside the story, and while the document is hidden. Pixel ratio is capped at 1.5; environments and scene geometry are procedural and local.
+- Reduced-motion preferences and short landscape viewports show the complete static reading mode. Anyone can choose Read the tour or Skip tour.
+- One shared scroll spring synchronizes the phone, screen crossfades, headings, and progress. Camera interpolation and screen crossfades are reversible. Copy fades away during the center of a scene transition to avoid overlapping headings.
+- The attached scroll-world reference informed narrative continuity; this implementation uses real-time 3D, not paid generated video.
+- Native QR dialogs retain Escape handling and browser focus containment. Existing APK redirect and integrity metadata remain unchanged.
 
 ## Security and maintenance
 
@@ -94,3 +80,4 @@ Never commit `.env.local`, Vercel credentials, or Blob tokens. The public websit
 `npm audit` reported zero vulnerabilities at implementation time. A PostCSS override and patched Sharp dependency retain the requested Next.js 15 major while resolving dependency advisories. Keep the lockfile and review future patch updates.
 
 This website has not undergone a conversion experiment, an Android device installation test, or a comprehensive accessibility audit. Motion is adaptive rather than a guarantee of 60–120 FPS on every device.
+

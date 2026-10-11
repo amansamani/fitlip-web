@@ -13,42 +13,47 @@ export const STEPS: Step[] = [
 export const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const N = STEPS.length;
 
+/** Smootherstep — zero jerk at both ends, glides instead of snapping. */
+const smoother = (m: number) => m * m * m * (m * (6 * m - 15) + 10);
+
 /**
- * Scroll path of the phone. Each step owns 1/N of the scroll.
- * First 70%: the phone slowly descends on its side. Last 30%: it swoops down and across
- * to the other side (the screen swaps at the lowest point), then rises into place.
- * xn: -1 = left, +1 = right. y is in world units (positive = up).
+ * SAFE keeps the resting phone fully inside the viewport (no top/bottom cut).
+ * The swoop dips below the fold on purpose — that's the transition, not a clip.
  */
+const SAFE = 0.2;
+
 export function pose(progress: number, reduce = false) {
   const u = clamp(progress) * N;
   const i = Math.min(N - 1, Math.floor(u));
   const t = u - i;
   const last = i === N - 1;
   const side = i % 2 ? 1 : -1;
-  const m = last ? 0 : clamp((t - 0.7) / 0.3);
-  const e = m * m * (3 - 2 * m);
+  const m = last ? 0 : clamp((t - 0.72) / 0.28);
+  const e = smoother(m);
   const dip = Math.sin(Math.PI * m);
-  const rest = last ? clamp(t) : clamp(t / 0.7);
+  const rest = last ? clamp(t) : clamp(t / 0.72);
+
   return {
     i, t, last,
     img: last ? i : m > 0.5 ? i + 1 : i,
     xn: side * (1 - 2 * e),
-    y: 0.4 - 0.8 * rest + (last ? 0 : 0.8 * e - 0.8 * dip),
-    yaw: reduce ? 0 : dip * -side,
-    pitch: reduce ? 0 : dip * 0.25,
-    roll: reduce ? 0 : dip * -side * 0.3,
+    // Rests between +0.2 and -0.2 (fully visible); dips only while swooping.
+    y: SAFE - 0.4 * rest + (last ? 0 : 0.4 * e - 0.9 * dip),
+    yaw: reduce ? 0 : dip * -side * 0.8,
+    pitch: reduce ? 0 : dip * 0.15,
+    roll: reduce ? 0 : dip * -side * 0.18,
   };
 }
 
 export function textOpacity(index: number, progress: number) {
   const q = pose(progress);
   if (q.i !== index) return 0;
-  const fadeIn = index === 0 ? 1 : clamp(q.t / 0.12);
-  const fadeOut = q.last ? 1 : clamp((0.78 - q.t) / 0.12);
+  const fadeIn = index === 0 ? 1 : clamp(q.t / 0.15);
+  const fadeOut = q.last ? 1 : clamp((0.8 - q.t) / 0.15);
   return fadeIn * fadeOut;
 }
 
 export function textShift(index: number, progress: number) {
   const q = pose(progress);
-  return q.i === index ? -(q.t - 0.4) * 70 : 0;
+  return q.i === index ? -(q.t - 0.4) * 40 : 0;
 }

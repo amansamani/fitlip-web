@@ -47,7 +47,7 @@ export function DownloadProvider({ children }: { children: React.ReactNode }) {
     try {
       const digest = await crypto.subtle.digest('SHA-256', await file.arrayBuffer());
       const hash = [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
-      if (hash === release.sha256) { setVerifyState('ok'); setVerifyMsg('Signature matches the official release. Safe to install.'); }
+      if (hash === release.sha256) { setVerifyState('ok'); setVerifyMsg('File fingerprint matches the published release.'); }
       else { setVerifyState('bad'); setVerifyMsg('Hash mismatch. Delete the file and download again.'); }
     } catch { setVerifyState('bad'); setVerifyMsg('Could not read the file. Try again.'); }
   }, []);
@@ -88,7 +88,7 @@ export function DownloadProvider({ children }: { children: React.ReactNode }) {
                   ))}
                 </ol>
                 <button onClick={download} className="font-cinematic mt-7 flex w-full items-center justify-center gap-2 bg-white py-4 text-sm text-black transition-transform hover:scale-[1.02]"><Download size={16} /> Download APK</button>
-                <button onClick={() => open('verify')} className="font-body mt-3 w-full text-center text-xs text-white/40 transition-colors hover:text-white/80">Already downloaded? Verify its signature</button>
+                <button onClick={() => open('verify')} className="font-body mt-3 w-full text-center text-xs text-white/40 transition-colors hover:text-white/80">Already downloaded? Verify its fingerprint</button>
               </div>
             )}
 
@@ -130,4 +130,13 @@ function HashRow({ copied, onCopy }: { copied: boolean; onCopy: () => void }) {
       <span className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-white/50">{copied ? <Check size={12} /> : <Copy size={12} />} {copied ? 'Copied' : 'SHA-256'}</span>
     </button>
   );
+}
+/** Compatibility actions for the retained alternate experience. */
+export function DownloadButton({ compact = false }: { compact?: boolean }) {
+  const { download } = useDownload();
+  return <button type="button" className={compact ? 'download-button compact' : 'download-button'} onClick={download}><Download size={16} /> Download for Android</button>;
+}
+export function QRButton() {
+  const { open } = useDownload();
+  return <button type="button" className="qr-button" onClick={() => open('qr')}><QrCode size={16} /> Scan to download</button>;
 }

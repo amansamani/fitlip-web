@@ -4,8 +4,8 @@ import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
 import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform, type MotionValue } from 'framer-motion';
 import { STEPS, pose, textOpacity, textShift, type Step as StepData } from '@/lib/tour';
+import { lenisRef } from '@/lib/smooth';
 
-// three.js is loaded only in the browser, and only when this section mounts.
 const PhoneCanvas = dynamic(() => import('./phone-canvas'), { ssr: false });
 const N = STEPS.length;
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -17,6 +17,9 @@ export function PhoneTour() {
   const [active, setActive] = useState(0);
   const [gl, setGl] = useState<boolean | null>(null);
   const [visible, setVisible] = useState(false);
+
+  // Label fades out as soon as the tour starts scrolling
+  const labelOpacity = useTransform(scrollYProgress, [0, 0.035], [1, 0]);
 
   useMotionValueEvent(scrollYProgress, 'change', (p) => setActive(pose(p, reduce).img));
 
@@ -40,8 +43,9 @@ export function PhoneTour() {
   const goTo = (i: number) => {
     const el = ref.current;
     if (!el) return;
-    const top = el.offsetTop + ((i + 0.3) / N) * (el.offsetHeight - innerHeight);
-    window.scrollTo({ top, behavior: reduce ? 'auto' : 'smooth' });
+    const top = el.offsetTop + ((i + 0.35) / N) * (el.offsetHeight - innerHeight);
+    if (lenisRef.current) lenisRef.current.scrollTo(top, { duration: 1.4 });
+    else window.scrollTo({ top, behavior: reduce ? 'auto' : 'smooth' });
   };
 
   return (
@@ -50,31 +54,69 @@ export function PhoneTour() {
       id="tour"
       aria-label="FitLip features"
       className="relative bg-plum-950"
-      style={{ height: `calc(${N} * 95vh + 100vh)` }}
+      style={{ height: `calc(${N} * 100vh + 100vh)` }}
     >
       <div className="sticky top-0 h-svh overflow-hidden">
-        <motion.div className="absolute left-0 top-0 z-30 h-0.5 w-full origin-left bg-brand-300" style={{ scaleX: scrollYProgress }} />
+        {/* Progress hairline */}
+        <motion.div
+          className="absolute left-0 top-0 z-40 h-px w-full origin-left"
+          style={{ scaleX: scrollYProgress, background: 'linear-gradient(90deg, #7c3aed, #f472b6, #c4b5fd)' }}
+        />
 
+        {/* Section label — single instance, fades away on scroll */}
+        <motion.div
+          style={{ opacity: labelOpacity }}
+          className="pointer-events-none absolute left-0 right-0 top-[calc(76px+env(safe-area-inset-top))] z-30 flex items-center justify-center gap-3 px-5"
+        >
+          <div className="h-px w-10 bg-white/15" />
+          <span className="text-[11px] uppercase tracking-[0.25em] text-white/35">The FitLip Experience</span>
+          <div className="h-px w-10 bg-white/15" />
+        </motion.div>
+
+        {/* 3D phone / flat fallback */}
         <div className="pointer-events-none absolute inset-0">
           {gl === true && <PhoneCanvas progress={scrollYProgress} reduce={reduce} active={visible} />}
           {gl === false && (
             <div className="grid h-full place-items-center">
-              {/* No WebGL: show the current screen as a flat image. */}
-              <img src={STEPS[active].src} alt={`FitLip ${STEPS[active].label} screen`} className="h-[62svh] rounded-[28px] border-4 border-[#2a1638]" />
+              <img
+                src={STEPS[active].src}
+                alt={`FitLip ${STEPS[active].label} screen`}
+                className="h-[58svh] rounded-[32px] border border-white/10 shadow-2xl"
+              />
             </div>
           )}
         </div>
+
+        {/* Cinematic vignette */}
+        <div className="tour-vignette pointer-events-none absolute inset-0 z-10" />
 
         {STEPS.map((s, i) => (
           <StepText key={s.id} index={i} step={s} progress={scrollYProgress} reduce={reduce} />
         ))}
 
-        <div aria-hidden="true" className="absolute bottom-[calc(22px+env(safe-area-inset-bottom))] left-[max(24px,7vw)] z-20 flex items-baseline gap-2.5 max-tour:bottom-auto max-tour:left-5 max-tour:top-[calc(72px+env(safe-area-inset-top))]">
-          <b className="font-display text-[44px] font-normal italic leading-none tour:text-[clamp(48px,6vw,88px)]">{pad(active + 1)}</b>
-          <span className="text-sm text-white/55">of {pad(N)}</span>
+        {/* Counter — single clean block */}
+        <div
+          aria-hidden="true"
+          className="absolute bottom-8 left-[max(28px,6vw)] z-30 flex items-baseline gap-3 max-tour:bottom-auto max-tour:left-5 max-tour:top-[calc(120px+env(safe-area-inset-top))]"
+        >
+          <motion.div
+            key={active}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+            className="display text-[clamp(40px,5vw,72px)] leading-none text-white"
+          >
+            {pad(active + 1)}
+          </motion.div>
+          <span className="text-xs uppercase tracking-widest text-white/30">/ {pad(N)}</span>
         </div>
 
-        <div role="group" aria-label="Choose a screen" className="absolute bottom-[calc(20px+env(safe-area-inset-bottom))] left-1/2 z-20 flex -translate-x-1/2 gap-0.5 rounded-[14px] border border-white/10 bg-white/10 p-1">
+        {/* Minimal line dock */}
+        <div
+          role="group"
+          aria-label="Choose a screen"
+          className="absolute bottom-10 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1.5"
+        >
           {STEPS.map((s, i) => (
             <button
               key={s.id}
@@ -82,12 +124,13 @@ export function PhoneTour() {
               onClick={() => goTo(i)}
               aria-label={`Show ${s.label}`}
               aria-current={i === active ? 'step' : undefined}
-              className={`flex h-9 cursor-pointer items-center justify-center rounded-[10px] px-2 text-[13px] font-medium transition-colors ${
-                i === active ? 'bg-brand px-3.5 text-white' : 'text-white/65 hover:text-white tour:px-3.5'
-              }`}
+              className="group flex items-center p-1.5"
             >
-              <span className={i === active ? '' : 'hidden tour:inline'}>{s.label}</span>
-              {i !== active && <span className="block size-2 rounded-full bg-current tour:hidden" aria-hidden="true" />}
+              <div
+                className={`h-[3px] rounded-full transition-all duration-500 ${
+                  i === active ? 'w-8 bg-gradient-to-r from-brand to-accent' : 'w-3 bg-white/20 group-hover:bg-white/45'
+                }`}
+              />
             </button>
           ))}
         </div>
@@ -96,16 +139,38 @@ export function PhoneTour() {
   );
 }
 
-function StepText({ index, step, progress, reduce }: { index: number; step: StepData; progress: MotionValue<number>; reduce: boolean }) {
+function StepText({
+  index,
+  step,
+  progress,
+  reduce,
+}: {
+  index: number;
+  step: StepData;
+  progress: MotionValue<number>;
+  reduce: boolean;
+}) {
   const opacity = useTransform(progress, (p) => textOpacity(index, p));
   const y = useTransform(progress, (p) => (reduce ? 0 : textShift(index, p)));
-  // Phone on the left for even steps, so their text sits on the right; the reverse for odd steps.
   const side = index % 2 === 0 ? 'tour:justify-end' : 'tour:justify-start';
+
   return (
-    <div className={`pointer-events-none absolute inset-0 z-10 flex items-end justify-center px-5 pb-[calc(78px+env(safe-area-inset-bottom))] tour:items-center tour:px-[7vw] tour:pb-0 ${side}`}>
-      <motion.article style={{ opacity, y }} className="w-full tour:w-[min(420px,34vw)]">
-        <h2 className="font-display text-[clamp(34px,9vw,48px)] font-normal italic leading-none tracking-[-0.01em] tour:text-[clamp(38px,5vw,76px)]">{step.title}</h2>
-        <p className="mt-2 max-w-[36ch] text-[15px] text-white/75 tour:mt-[18px] tour:text-[clamp(16px,1.3vw,18px)]">{step.body}</p>
+    <div
+      className={`pointer-events-none absolute inset-0 z-20 flex items-end justify-center px-6 pb-28 tour:items-center tour:px-[8vw] tour:pb-0 ${side}`}
+    >
+      <motion.article style={{ opacity, y }} className="w-full tour:w-[min(480px,38vw)]">
+        <div className="mb-4 flex items-center gap-3">
+          <div className="h-px w-8 bg-brand-300/50" />
+          <span className="text-[11px] uppercase tracking-[0.25em] text-brand-300">{step.label}</span>
+        </div>
+
+        <h2 className="display-case text-[clamp(32px,7vw,50px)] text-white tour:text-[clamp(40px,4.2vw,64px)]">
+          {step.title}
+        </h2>
+
+        <p className="mt-5 max-w-[40ch] text-[15px] leading-relaxed text-white/55 tour:mt-6 tour:text-[clamp(16px,1.25vw,18px)]">
+          {step.body}
+        </p>
       </motion.article>
     </div>
   );
