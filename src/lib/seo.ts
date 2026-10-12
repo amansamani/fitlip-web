@@ -14,7 +14,7 @@ export const structuredData = {
       operatingSystem: `Android ${release.minAndroid} or later`, softwareVersion: release.version,
       fileSize: release.size, downloadUrl: `${canonicalOrigin}/api/download`,
       image: `${canonicalOrigin}/opengraph-image.png`,
-      screenshot: ['home','camera','nutrition','workouts','run','tracking','coach'].map(name=>`${canonicalOrigin}/screens/${name}.webp`),
+      screenshot: ['home','progress','camera','nutrition','workouts','run','tracking','coach'].map(name=>`${canonicalOrigin}/screens/${name}.webp`),
       featureList: ['Meal photo logging with review','Calorie and macronutrient tracking','Workout planning','Running, walking, and cycling tracking','Steps, active calories, and sleep tracking','AI coaching using logged records'],
       mainEntityOfPage: `${canonicalOrigin}/`,
     },

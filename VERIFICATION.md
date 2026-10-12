@@ -1,33 +1,22 @@
-# Validation record — 8 October 2026
+# Validation record — 12 October 2026
 
 ## Completed
 
 - Production compilation and TypeScript checking pass with Next.js 15.5.27.
-- `npm audit` reports zero known dependency vulnerabilities after applying the PostCSS and Sharp fixes.
-- Android SDK `aapt` identifies version 2.0.0, code 1, minimum SDK 26, target SDK 36.
-- Android SDK `apksigner verify --print-certs` passes.
-- Local download endpoint returns HTTP 307 with a relative location and the expected `X-APK-SHA256` header.
-- Local static APK response returns HTTP 200, Android package MIME type, and attachment filename.
-- Streaming the entire local HTTP download yields exactly 162,673,198 bytes and the release SHA-256 fingerprint.
-- Browser file verifier accepts the supplied APK and reports that it matches the published release.
-- QR dialog renders and points at the installation page on the current origin.
-- Installation stepper advances through all three steps; the illustrative Android permission switch toggles.
-- App screen selection updates the displayed screen and pressed state.
-- Phone rendering, exploded layers, and module badge choreography inspected in a desktop browser.
-- Desktop 1440×1000 and mobile 390×844 layouts inspected; no document horizontal overflow at either size.
-- No browser errors or warnings observed in the final local preview check.
-- Vercel cloud build independently streamed and verified the hosted APK's SHA-256 and size.
-- Public production home page and release endpoint return HTTP 200 without Vercel authentication.
-- Public download handler returns HTTP 307 to the Vercel Blob asset.
-- Hosted APK responds with HTTP 200, content length 162673198, APK MIME type, and attachment filename `fitlip-2.0.0.apk`.
-
-Production website: https://fitlip.vercel.app
-Vercel project: https://vercel.com/amansamanis-projects/fitlip
+- The release checksum gate accepts the bundled APK at exactly 166,565,551 bytes with SHA-256 `b186c84d1cf92c8b61f3695f98dd44cafd29590b30c24dc1cacd7a5a0e4cdfbf`.
+- Android SDK `aapt2` identifies FitLip 2.0.0, version code 3, package `com.fitlip.app`, minimum SDK 26, and target SDK 36.
+- The APK contains native libraries for ARM64, ARMv7, x86, and x86_64.
+- Android SDK `apksigner` verifies the APK Signature Scheme v2 signature and one signer with certificate SHA-256 `97161d8f322fcf9611fa8b31a6e2d6ad0def6414e2773d2e918452a3b2defe87`.
+- All eight supplied 1080 × 2340 screenshots were converted to optimized 810 × 1755 WebP assets and visually inspected.
+- The additional weekly-nutrition capture is retained as `progress.webp` and used in the story, tour, release gallery data, and structured metadata.
+- The Open Graph image was refreshed with the new home screen and visually inspected at 1200 × 630.
+- Local `/api/release` returns version code 3, package `com.fitlip.app`, the new byte size, and the new fingerprint.
+- Local `/api/download` returns HTTP 307 to `/downloads/fitlip-2.0.0.apk` with `Cache-Control: no-store` and the matching `X-APK-SHA256` header.
+- The local static APK returns HTTP 200 with the Android package MIME type, attachment filename, range support, and content length 166,565,551.
+- Server-rendered page output includes the 166.6 MB release size, full fingerprint, and the new weekly-progress asset.
+- The refreshed opening scene was inspected in a 1440 × 1000 browser capture.
+- No deployment was performed.
 
 ## Limits of this validation
 
-No installation was performed on a physical Android phone. No independent malware scan, device compatibility matrix, formal accessibility audit, frame-rate benchmark, or conversion experiment was performed. Motion permission and context-loss fallback are implemented but were not exercised on physical low-power devices. The supplied screenshots demonstrate the native app UI; this site does not connect to the app backend.
-
-The Vercel Blob release URL is public, versioned, and non-overwriting:
-
-https://mgrl0hrlmguvtqw3.public.blob.vercel-storage.com/releases/fitlip-2.0.0.apk?download=1
+No installation was performed on a physical Android phone. No independent malware scan, device compatibility matrix, formal accessibility audit, frame-rate benchmark, or conversion experiment was performed. Motion permission and context-loss fallback were not exercised on physical low-power devices. The supplied screenshots demonstrate the native app UI; this site does not connect to the app backend.

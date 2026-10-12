@@ -77,7 +77,7 @@ export function DownloadProvider({ children }: { children: React.ReactNode }) {
                 <Title icon={<Smartphone size={20} />} t="Install FitLip" s="Three steps, under a minute." />
                 <ol className="mt-6 space-y-4">
                   {[
-                    ['Download the APK', '162.7 MB, straight from the release server.'],
+                    ['Download the APK', `${release.size}, straight from the release server.`],
                     ['Allow unknown sources', 'Settings → Apps → your browser → allow installs.'],
                     ['Open & install', 'Tap the finished download and confirm.'],
                   ].map(([t, s], i) => (

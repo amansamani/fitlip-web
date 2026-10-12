@@ -17,7 +17,7 @@ Open http://localhost:3000. Production: `npm run build` then `npm start`. `npm r
 
 The opening is a continuous, scroll-controlled 3D product story, followed by everyday feature cards, Android download, QR dialog, installation FAQ, and file-integrity controls.
 
-The eight story chapters are: introduction → daily overview → meal capture → nutrition → training → outdoor activity → daily tracking → AI coach. One Three.js phone moves between sides, tilts, moves through depth, and crossfades real app screenshots. Procedural scene objects add context: a plate, macro rings, a dumbbell, an outdoor route, activity rings, and a coaching chart. The opening adapts the native splash's bouncing F, purple bloom, and Exercise / Diet / Track icons, without orbit rings or looping movement. Normal scrolling works in both directions on desktop and mobile. Chapter buttons jump to exact scene landings; Skip tour leads directly to the supporting sections.
+The eight story chapters are: introduction → weekly progress → meal capture → nutrition → training → outdoor activity → daily tracking → AI coach. One Three.js phone moves between sides, tilts, moves through depth, and crossfades real app screenshots. Procedural scene objects add context: a plate, macro rings, a dumbbell, an outdoor route, activity rings, and a coaching chart. The opening adapts the native splash's bouncing F, purple bloom, and Exercise / Diet / Track icons, without orbit rings or looping movement. Normal scrolling works in both directions on desktop and mobile. Chapter buttons jump to exact scene landings; Skip tour leads directly to the supporting sections.
 
 The header and footer use the exact custom vector wordmark from the mobile app's `src/components/share/FitLipWordmark.tsx`, including the sweeping F and original letter/dot outlines. This is not an approximated font.
 
@@ -45,21 +45,21 @@ All eight chapter narratives are present in the server-rendered HTML. The 3D sce
 
 ## APK release
 
-- App/package: Fitlip / `com.amansamani.aihealthfrontend`
-- Version: 2.0.0, version code 1
+- App/package: FitLip / `com.fitlip.app`
+- Version: 2.0.0, version code 3
 - Minimum SDK: 26 (Android 8.0), target SDK 36
-- Size: 162,673,198 bytes (162.7 decimal MB)
-- SHA-256: `a304c1b00cf7ab5612d04c8a6fa6e441ed4cdd0fc9a891593770b5dd8d4871df`
-- Android signing certificate SHA-256: `f79fcd8937facb5457a6578f8505dc047c51ef8a4fdd41fa6cac3be8120afa1c`
+- Size: 166,565,551 bytes (166.6 decimal MB)
+- SHA-256: `b186c84d1cf92c8b61f3695f98dd44cafd29590b30c24dc1cacd7a5a0e4cdfbf`
+- Android signing certificate SHA-256: `97161d8f322fcf9611fa8b31a6e2d6ad0def6414e2773d2e918452a3b2defe87`
 - Android signature verified using the installed Android SDK apksigner. This is not a malware scan or proof of publisher identity. No VirusTotal clean badge or malware-free guarantee is asserted.
 
 The screenshot data is sample app activity, not promised outcomes. The website displays interactive screenshot previews; it does not run the native app or connect to its backend. Existing app branding remains visible inside the screenshots.
 
 ## Downloads and Vercel
 
-The 162.7 MB APK exceeds the documented Hobby CLI source-upload limit. `.vercelignore` excludes it from the website deployment. A public Vercel Blob store holds the immutable release artifact. `APK_DOWNLOAD_URL` must be configured in Vercel before building without the bundled APK.
+The 166.6 MB APK exceeds the documented Hobby CLI source-upload limit. `.vercelignore` excludes it from the website deployment. A public object store can hold the immutable release artifact when deployment is requested. `APK_DOWNLOAD_URL` must be configured before building without the bundled APK.
 
-`GET /api/download` returns a no-store 307 redirect to the configured HTTPS asset URL, or a relative static asset path for local use. No 162.7 MB response is buffered in a Vercel Function. The CDN/Blob delivery supports a complete file download; the static fallback sets attachment headers. `GET /api/release` returns public metadata.
+`GET /api/download` returns a no-store 307 redirect to the configured HTTPS asset URL, or a relative static asset path for local use. The APK is never buffered in a Vercel Function. The CDN/Blob delivery supports a complete file download; the static fallback sets attachment headers. `GET /api/release` returns public metadata.
 
 Build verification streams and checks the external APK if the bundled file is absent. Do not deploy without a successful hash check. Do not change a published release in place: publish a new versioned filename, update the metadata and expected values in the build script, and verify it before deployment.
 

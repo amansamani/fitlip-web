@@ -2,8 +2,9 @@ export type Step = { id: string; label: string; src: string; title: string; body
 
 export const STEPS: Step[] = [
   { id: 'home', label: 'Home', src: '/screens/home.webp', title: 'Everything for today, on one screen.', body: "Calories left, macros, today's meals and steps, the moment you open FitLip." },
+  { id: 'progress', label: 'Progress', src: '/screens/progress.webp', title: 'See the shape of your week.', body: 'Review nutrition consistency, average intake and weight change as your records build.' },
   { id: 'diet', label: 'Diet', src: '/screens/nutrition.webp', title: 'A meal plan with a calorie budget.', body: "See your target, your macros and today's meals. Tap a meal when you've eaten it." },
-  { id: 'coach', label: 'Coach', src: '/screens/coach.webp', title: 'Ask your coach.', body: 'Ask for a seven-day calorie chart and it answers from your logged meals, not a guess.' },
+  { id: 'coach', label: 'Coach', src: '/screens/coach.webp', title: 'Ask your coach.', body: 'Ask for your active diet plan or compare days using the meals and movement in your FitLip records.' },
   { id: 'camera', label: 'Camera', src: '/screens/camera.webp', title: 'Log a meal with a photo.', body: 'Photograph your plate, review the foods and portions, then log it.' },
   { id: 'exercise', label: 'Exercise', src: '/screens/workouts.webp', title: 'A training plan for the week.', body: 'Six days of workouts, with or without equipment. Each day lists its exercises.' },
   { id: 'track', label: 'Track', src: '/screens/tracking.webp', title: 'Steps, burn and sleep.', body: "See how much of today's goals you've finished, and update your numbers any time." },
