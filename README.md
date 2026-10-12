@@ -2,7 +2,7 @@
 
 Next.js 15.5.27 / React 19 / TypeScript / Tailwind 4 / React Three Fiber / drei / Framer Motion. Built for Vercel.
 
-Live website: https://fitlip.vercel.app
+Live website: https://fitlip.amansamani.me
 
 ## Local use
 
@@ -11,7 +11,7 @@ npm ci
 npm run dev
 ```
 
-Open http://localhost:3000. Production: `npm run build` then `npm start`. `npm run build` runs the APK checksum gate first, so it needs the real APK in `public/downloads/` or `APK_DOWNLOAD_URL` set. For a quick UI-only build, run `npx next build`.
+Open http://localhost:3000. Production: `npm run build` then `npm start`. `npm run build` runs the APK checksum gate first, using the bundled APK when present and the configured GitHub Release asset otherwise. For a quick UI-only build, run `npx next build`.
 
 ## Page structure
 
@@ -39,9 +39,9 @@ The header and footer use the exact custom vector wordmark from the mobile app's
 
 ## Editing and SEO
 
-Edit the story content and timing in `src/lib/story.ts`. The animation maps scroll progress to the same chapter data, including the fallback screenshots. Set `NEXT_PUBLIC_SITE_URL` to the intended production origin for canonical URLs, the sitemap, structured data, and QR download. Default: `https://fitlip.vercel.app`.
+Edit the story content and timing in `src/lib/story.ts`. The animation maps scroll progress to the same chapter data, including the fallback screenshots. Set `NEXT_PUBLIC_SITE_URL` to the intended production origin for canonical URLs, the sitemap, structured data, and QR download. Default: `https://fitlip.amansamani.me`.
 
-All eight chapter narratives are present in the server-rendered HTML. The 3D scene loads separately on the client. Metadata describes the actual Android app; structured data does not invent reviews, ratings, pricing, or publisher claims. The sitemap includes the landing page; crawler rules exclude API routes and APK files. Search Console submission and public indexing checks require a future deployment and were not performed.
+All eight chapter narratives are present in the server-rendered HTML. The 3D scene loads separately on the client. Metadata describes the actual Android app; structured data does not invent reviews, ratings, pricing, or publisher claims. The sitemap includes the landing page; crawler rules exclude API routes and APK files. Search Console submission and public indexing checks were not performed.
 
 ## APK release
 
@@ -57,9 +57,9 @@ The screenshot data is sample app activity, not promised outcomes. The website d
 
 ## Downloads and Vercel
 
-The 166.6 MB APK exceeds the documented Hobby CLI source-upload limit. `.vercelignore` excludes it from the website deployment. A public object store can hold the immutable release artifact when deployment is requested. `APK_DOWNLOAD_URL` must be configured before building without the bundled APK.
+The 166.6 MB APK exceeds the documented Hobby CLI source-upload limit. `.vercelignore` excludes it from the website deployment. The immutable APK is hosted as a public GitHub Release asset at `amansamani/fitlip-releases`.
 
-`GET /api/download` returns a no-store 307 redirect to the configured HTTPS asset URL, or a relative static asset path for local use. The APK is never buffered in a Vercel Function. The CDN/Blob delivery supports a complete file download; the static fallback sets attachment headers. `GET /api/release` returns public metadata.
+`GET /api/download` returns a no-store 307 redirect to the GitHub Release asset. GitHub responds with an attachment, so a click starts the APK download without showing a GitHub page. The APK is never buffered in a Vercel Function. `GET /api/release` returns public metadata.
 
 Build verification streams and checks the external APK if the bundled file is absent. Do not deploy without a successful hash check. Do not change a published release in place: publish a new versioned filename, update the metadata and expected values in the build script, and verify it before deployment.
 

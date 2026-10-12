@@ -9,6 +9,7 @@ export const release = {
   sha256: 'b186c84d1cf92c8b61f3695f98dd44cafd29590b30c24dc1cacd7a5a0e4cdfbf',
   filename: 'fitlip-2.0.0.apk',
   path: '/downloads/fitlip-2.0.0.apk',
+  downloadUrl: 'https://github.com/amansamani/fitlip-releases/releases/download/Create_new_tag_v1.0.0_on_publish/fitlip.v2.0.0.apk',
   scanStatus: 'unverified',
 } as const;
 export const screens = [
@@ -23,6 +24,6 @@ export const screens = [
 ] as const;
 
 /** Public origin used to build the QR code. Set NEXT_PUBLIC_SITE_URL when you use a custom domain. */
-export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://fitlip.vercel.app';
+export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://fitlip.amansamani.me';
 /** SHA-256 of the Android signing certificate, verified with apksigner (see README). */
 export const signingCertSha256 = '97161d8f322fcf9611fa8b31a6e2d6ad0def6414e2773d2e918452a3b2defe87';

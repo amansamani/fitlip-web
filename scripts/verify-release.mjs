@@ -1,10 +1,10 @@
 import { createHash } from 'node:crypto';
 import { createReadStream, existsSync } from 'node:fs';
 const file = new URL('../public/downloads/fitlip-2.0.0.apk', import.meta.url);
+const downloadUrl = 'https://github.com/amansamani/fitlip-releases/releases/download/Create_new_tag_v1.0.0_on_publish/fitlip.v2.0.0.apk';
 const expected = 'b186c84d1cf92c8b61f3695f98dd44cafd29590b30c24dc1cacd7a5a0e4cdfbf';
 if (!existsSync(file)) {
-  if (!process.env.APK_DOWNLOAD_URL) throw new Error('APK missing and APK_DOWNLOAD_URL is not set.');
-  const url = new URL(process.env.APK_DOWNLOAD_URL);
+  const url = new URL(downloadUrl);
   if (url.protocol !== 'https:') throw new Error('APK URL must use HTTPS.');
   const response = await fetch(url);
   if (!response.ok || !response.body) throw new Error('Remote APK unavailable.');

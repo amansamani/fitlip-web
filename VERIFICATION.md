@@ -11,11 +11,16 @@
 - The additional weekly-nutrition capture is retained as `progress.webp` and used in the story, tour, release gallery data, and structured metadata.
 - The Open Graph image was refreshed with the new home screen and visually inspected at 1200 × 630.
 - Local `/api/release` returns version code 3, package `com.fitlip.app`, the new byte size, and the new fingerprint.
-- Local `/api/download` returns HTTP 307 to `/downloads/fitlip-2.0.0.apk` with `Cache-Control: no-store` and the matching `X-APK-SHA256` header.
+- Local `/api/download` returns HTTP 307 to the public GitHub Release APK with `Cache-Control: no-store` and the matching `X-APK-SHA256` header.
 - The local static APK returns HTTP 200 with the Android package MIME type, attachment filename, range support, and content length 166,565,551.
 - Server-rendered page output includes the 166.6 MB release size, full fingerprint, and the new weekly-progress asset.
 - The refreshed opening scene was inspected in a 1440 × 1000 browser capture.
-- No deployment was performed.
+- Vercel production build independently streamed and verified the remote APK's SHA-256 and size.
+- Production deployment `dpl_7Mgrj8Lu3mDTDHa2Q14P5U9inuy8` completed successfully and is aliased to `https://fitlip.amansamani.me`.
+- The live page returns HTTP 200, emits the custom domain as its canonical origin, and contains no stale `fitlip.vercel.app` origin.
+- The live sitemap uses `https://fitlip.amansamani.me/`.
+- The live release endpoint returns version code 3, package `com.fitlip.app`, 166,565,551 bytes, and the expected SHA-256.
+- The currently deployed download endpoint still targets the verified build-3 Blob; this source change to the GitHub Release asset has not been deployed.
 
 ## Limits of this validation
 
