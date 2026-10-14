@@ -4,12 +4,12 @@ export const release = {
   packageName: 'com.fitlip.app',
   minAndroid: '8.0',
   minSdk: 26,
-  bytes: 166565551,
-  size: '166.6 MB',
-  sha256: 'b186c84d1cf92c8b61f3695f98dd44cafd29590b30c24dc1cacd7a5a0e4cdfbf',
-  filename: 'fitlip-2.0.0.apk',
-  path: '/downloads/fitlip-2.0.0.apk',
-  downloadUrl: 'https://github.com/amansamani/fitlip-releases/releases/download/Create_new_tag_v1.0.0_on_publish/fitlip.v2.0.0.apk',
+  bytes: 164000000,
+  size: '164 MB',
+  sha256: 'fcea2574fd2e9a0695611aad0e23d72bfd48f774fe34c58755dec38f72014fe0',
+ filename: 'fitlip.V2.0.0.apk',
+  path: '/downloads/fitlip.V2.0.0.apk',
+  downloadUrl: 'https://github.com/amansamani/fitlip-releases/releases/download/Create_new_tag_v1.0.0_on_publish/fitlip.V2.0.0.apk',
   scanStatus: 'unverified',
 } as const;
 export const screens = [
